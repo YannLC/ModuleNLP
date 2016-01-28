@@ -23,5 +23,4 @@ def scatter(X, names, labels, sizes=1, title=None, colormap=bk.palettes.Spectral
     hover = p.select(dict(type=bk.models.HoverTool))
     hover.tooltips = "<p style='font-size: 12px'>@name, @label</p>"
 
-
     bp.show(p)

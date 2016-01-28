@@ -1,6 +1,6 @@
 
-# Mots qui peuvent être transformé en faux amis par les regles suffixes
-defaultInvariants = 'due one max use six its she may they sex user normal here que Ile Paris Rennes poste ete mais mois tél aller ENS ens celle regarder lorsque'
+# Mots qui peuvent être transformé en faux amis par les regles 'suffixes'
+defaultInvariants = 'due one max use six its she may they sex user normal here que Ile Paris Rennes poste ete mais mois tél aller ENS ens celle regarder lorsque pays dos poster Latex EST'
 
 # Mots dont le stem est irrégulier
 defaultMap = {'ses': 'son',
@@ -37,6 +37,7 @@ suffixes = [
             ('s' , ''),
             ('x' , ''),
 
+            ('elle', 'el'),
             ('e' , ''),
 
             ('é' , ''),
@@ -68,7 +69,11 @@ class Stemmer:
 
 
         if lenw <= 2 or w[-1] == w[-2]: # see, fee, less, is, as, etc
-            return w
+            if w != 'I':
+                return w.lower()
+            else:
+                return w
+
 
 
         candidates = set()
@@ -89,6 +94,7 @@ class Stemmer:
                 return res
 
         return w
+
 
     def printMapping(self):
         termMap = self.termMap

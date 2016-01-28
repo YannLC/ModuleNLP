@@ -126,7 +126,7 @@ class Email:
 
         # Il y a quelques 404, ils sont mis en cache et repérés par une str
         if html == '404' or html == '403':
-            print('Error {}: {}.'.format(html, url))
+            warning('Error {}: {}.'.format(html, url))
             self.valid = False
             return
 
@@ -166,16 +166,19 @@ class Email:
 
 archivedir = 'archives_SFBI/2015_06_10-bioinfo_archives_annee_2014'
 def mailLoaderGen(archivedir=archivedir):
-    dedup = set()
+    dedup = {}
     for mounth in listdir(archivedir):
         mounthdir = path.join(archivedir, mounth)
         for mailfn in listdir(mounthdir):
-            # Passe sur les fichiers recoded
+            # Passe sur les fichiers .recoded
             if mailfn.endswith(".recoded"):
                 continue
-            mail = Email(path.join(mounthdir, mailfn)).load()
+            mailfile = path.join(mounthdir, mailfn)
+            mail = Email(mailfile).load()
             if mail.valid:
                 key = (mail.timestamp, mail.sujet)
                 if key not in dedup:
+                    dedup[key] = mail.mailfile
                     yield mail
-                    dedup.add(key)
+                else:
+                    warning('duplicates {} <-> {}'.format(dedup[key], mailfile))

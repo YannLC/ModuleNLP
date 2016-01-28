@@ -1,7 +1,7 @@
 import time
 import os
 from collections import Counter
-from nltk import tekenize
+from nltk import tokenize
 import re
 
 
