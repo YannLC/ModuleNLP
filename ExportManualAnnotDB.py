@@ -5,6 +5,9 @@
 
 from datetime import date
 from emailparser import mailLoaderGen
+from tokenizer import iterTokenizedSentences
+from stemmer import Stemmer
+from collections import Counter
 
 fields = [
  'mailfile',
@@ -25,7 +28,16 @@ fields = [
 
 outdir = 'archives_SFBI_AnnotationManuelle'
 
-for m in mailLoaderGen():
+mails = list(mailLoaderGen())
+words = Counter()
+for mail in mails:
+    mail.sents = list(iterTokenizedSentences(mail.description))
+    for sent in mail.sents:
+        words.update(sent)
+
+stemmer = Stemmer(set(word for (word,n) in words.items() if n > 10))
+
+for m in mails:
     outf = outdir + m.mailfile.strip('archives_SFBI')
     d = m.__dict__
     d['date'] = date.fromtimestamp(d['timestamp']).strftime("%d %B %Y")
@@ -50,7 +62,12 @@ for m in mailLoaderGen():
             if field in d:
                 f.write('* {}: {}\n'.format(field, d[field]))
                 
-        f.write('\n')
-        f.write('-'*60)
-        f.write('\n')
+
+        f.write('-'*60 + '\n')
+
         f.write(m.description)
+
+        f.write('-'*60 + '\n')
+
+        for sent in m.sents:
+            f.write(' '.join(stemmer.stem(word) for word in sent) + '\n')
