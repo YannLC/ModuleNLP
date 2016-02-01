@@ -53,7 +53,7 @@ cachedir='cacheSFBI'
 fieldtypeClass = 'field-type-'
 fieldnameClass = 'field-field-emploi-'
 
-def extractText(e):
+def extractText(e, inP=False):
     text = e.text
     tail = e.tail
     tag = e.tag
@@ -64,18 +64,18 @@ def extractText(e):
 
     if not islabel:
         if text:
-            acc.append(text.strip())
+            acc.append(text if inP else text.strip())
 
         # recursion
-        acc.extend(extractText(c) for c in e)
+        acc.extend(extractText(c, inP=inP or tag == 'p') for c in e)
 
         if tag == 'br':
             acc.append('\n')
-        elif tag == 'p':
+        elif tag == 'p' or tag == 'li':
             acc.append('\n\n')
 
     if tail:
-        acc.append(tail.strip())
+        acc.append(tail if inP else tail.strip())
 
     return ''.join(acc)
 
@@ -154,14 +154,11 @@ class Email:
 
             assert len(items) > 0
             if len(items) > 1:
-                content = set(extractText(i) for i in items)
+                content = set(extractText(i).strip() for i in items)
             else:
-                content = extractText(items[0]).replace('\xa0', ' ')
+                content = extractText(items[0]).replace('\xa0', ' ').strip()
 
-            if fieldname == 'type':
-                self.tags = set(tag.strip() for tag in content.split('›'))
-            else:
-                setattr(self, fieldname, content)
+            setattr(self, fieldname, content)
 
 
 archivedir = 'archives_SFBI/2015_06_10-bioinfo_archives_annee_2014'
