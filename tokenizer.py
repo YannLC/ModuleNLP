@@ -33,18 +33,17 @@ def cleanWords(words):
                 yield "_number_"
         elif wordWoHyphen.isalnum():
             left, center, right = lword.partition('h')
-            if left.isdecimal() and center == 'h' and right.isdecimal():
+            if left.isdecimal() and center == 'h' and (not right or right.isdecimal()):
                 yield "_hour_"
             else:
-               Exception('Unknown alphanum word class :' + repr(word))
+               yield word
         elif word[0] == '_' and word[-1] == '_':
             yield word
         elif l <= 2 and all(c in '«»‘’\'"{[()]}.,;:…?&-/' for c in word):
-            #print([c for c in word])
             for c in word:
                 if c in "«»‘":
                     yield '"'
-                if c == '’':
+                elif c == '’':
                     yield "'"
                 elif c == '…':
                     yield '...'
